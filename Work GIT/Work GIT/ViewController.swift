@@ -14,12 +14,20 @@ final class ViewController: UIViewController {
         setupAppearanceView()
         layoutTextFields()
         setupAppearanceTextFields()
+        setupNotificationCenter()
+        closeKeyboard()
     }
 
     // MARK: - helpers
 
     private func setupAppearanceView() {
         view.backgroundColor = .white
+    }
+
+    private func closeKeyboard() {
+        let tap = UIGestureRecognizer(target: self, action: #selector(tapOnScreen))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
     }
 
     private func layoutTextFields() {
@@ -47,5 +55,46 @@ final class ViewController: UIViewController {
         nameTextField.placeholder = "Введите имя"
         ageTextField.placeholder = "Введите возраст"
         ageTextField.keyboardType = .numberPad
+    }
+
+    private func setupNotificationCenter() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(showKeyBoard),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(hideKeyBoard),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil)
+    }
+
+    @objc func showKeyBoard(_ notification: Notification) {
+        if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardHeight = keyboardFrame.cgRectValue.height
+            view.frame.origin.y -= keyboardHeight / 2
+            
+            UIView.animate(withDuration: CATransaction.animationDuration()) {
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
+
+    @objc func hideKeyBoard(notification: Notification) {
+        view.frame.origin.y = 0
+
+        UIView.animate(withDuration: CATransaction.animationDuration()) {
+            self.view.layoutIfNeeded()
+        }
+    }
+
+    @objc func tapOnScreen() {
+        view.endEditing(true)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 }
