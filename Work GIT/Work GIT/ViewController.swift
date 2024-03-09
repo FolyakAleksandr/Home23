@@ -8,31 +8,38 @@ final class ViewController: UIViewController {
 
     private let alertButton = UIButton()
 
+    // MARK: - private variables
+
+    private var counter = 0
+
     // MARK: - lyfe cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        // view
         setupAppearanceView()
+
+        // textFields
         layoutTextFields()
         setupAppearanceTextFields()
-        setupNotificationCenter()
-        closeKeyboard()
 
+        // button
         layoutButton()
         setupAppearanceButton()
+        tapToButton()
+
+        // NotificationCenter
+        setupNotificationCenter()
+
+        // other
+        closeKeyboard()
     }
 
     // MARK: - helpers
 
     private func setupAppearanceView() {
         view.backgroundColor = .white
-    }
-
-    private func closeKeyboard() {
-        let tap = UIGestureRecognizer(target: self, action: #selector(tapOnScreen))
-        tap.cancelsTouchesInView = false
-        view.addGestureRecognizer(tap)
     }
 
     private func layoutTextFields() {
@@ -62,19 +69,6 @@ final class ViewController: UIViewController {
         ageTextField.keyboardType = .numberPad
     }
 
-    private func setupNotificationCenter() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(showKeyBoard),
-            name: UIResponder.keyboardWillShowNotification,
-            object: nil)
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(hideKeyBoard),
-            name: UIResponder.keyboardWillHideNotification,
-            object: nil)
-    }
-
     private func layoutButton() {
         view.addSubview(alertButton)
         alertButton.translatesAutoresizingMaskIntoConstraints = false
@@ -96,8 +90,48 @@ final class ViewController: UIViewController {
         alertButton.layer.shadowOpacity = 0.5
     }
 
+    private func tapToButton() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(sendData))
+        alertButton.addGestureRecognizer(tap)
+    }
+
+    private func setupNotificationCenter() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(showKeyBoard),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(hideKeyBoard),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil)
+    }
+
+    private func closeKeyboard() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapOnScreen))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+
+    // @objc methods
+    @objc func sendData() {
+        let nameTF = nameTextField.text
+        let ageTF = ageTextField.text
+
+        if nameTF == "" || ageTF == "" {
+            showAlert(title: "Упс..", message: "Кажется, вы ввели не все данные.")
+        } else {
+            showAlert(title: "Успех!", message: "Вы удачно отправили свои данные.")
+            nameTextField.text = .none
+            ageTextField.text = .none
+        }
+    }
+
     @objc func showKeyBoard(_ notification: Notification) {
-        if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+        counter += 1
+        if counter == 1 {
+            guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
             let keyboardHeight = keyboardFrame.cgRectValue.height
             view.frame.origin.y -= keyboardHeight / 2
 
@@ -108,19 +142,32 @@ final class ViewController: UIViewController {
     }
 
     @objc func hideKeyBoard(notification: Notification) {
-        view.frame.origin.y = 0
-
         UIView.animate(withDuration: CATransaction.animationDuration()) {
+            self.view.frame.origin.y = 0
             self.view.layoutIfNeeded()
+            self.counter = 0
         }
     }
 
     @objc func tapOnScreen() {
         view.endEditing(true)
+        ageTextField.resignFirstResponder()
+        nameTextField.resignFirstResponder()
     }
 
     deinit {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+}
+
+// MARK: - extension
+
+extension ViewController {
+    func showAlert(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "OK", style: .default)
+        alertController.addAction(alertAction)
+        present(alertController, animated: true)
     }
 }
