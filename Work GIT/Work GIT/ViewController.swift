@@ -6,6 +6,8 @@ final class ViewController: UIViewController {
     private let nameTextField = UITextField()
     private let ageTextField = UITextField()
 
+    private let alertButton = UIButton()
+
     // MARK: - lyfe cycle
 
     override func viewDidLoad() {
@@ -16,6 +18,9 @@ final class ViewController: UIViewController {
         setupAppearanceTextFields()
         setupNotificationCenter()
         closeKeyboard()
+
+        layoutButton()
+        setupAppearanceButton()
     }
 
     // MARK: - helpers
@@ -70,11 +75,32 @@ final class ViewController: UIViewController {
             object: nil)
     }
 
+    private func layoutButton() {
+        view.addSubview(alertButton)
+        alertButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            alertButton.topAnchor.constraint(equalTo: ageTextField.bottomAnchor, constant: 30),
+            alertButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.48),
+            alertButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+    }
+
+    private func setupAppearanceButton() {
+        alertButton.setTitle("Отправить данные!", for: .normal)
+        alertButton.setTitleColor(.white, for: .normal)
+        alertButton.backgroundColor = .systemBlue
+        alertButton.layer.cornerRadius = 10
+        alertButton.layer.shadowColor = UIColor.systemBlue.cgColor
+        alertButton.layer.shadowOffset = .init(width: 0, height: 0)
+        alertButton.layer.shadowRadius = 8
+        alertButton.layer.shadowOpacity = 0.5
+    }
+
     @objc func showKeyBoard(_ notification: Notification) {
         if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let keyboardHeight = keyboardFrame.cgRectValue.height
             view.frame.origin.y -= keyboardHeight / 2
-            
+
             UIView.animate(withDuration: CATransaction.animationDuration()) {
                 self.view.layoutIfNeeded()
             }
