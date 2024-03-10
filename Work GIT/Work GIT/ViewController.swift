@@ -39,7 +39,7 @@ final class ViewController: UIViewController {
     // MARK: - helpers
 
     private func setupAppearanceView() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemGray4
     }
 
     private func layoutTextFields() {
