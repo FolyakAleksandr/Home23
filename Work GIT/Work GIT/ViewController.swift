@@ -62,7 +62,7 @@ final class ViewController: UIViewController {
         for el in [nameTextField, ageTextField] {
             el.borderStyle = .roundedRect
             el.tintColor = .black
-            el.font = UIFont.systemFont(ofSize: 18)
+            el.font = UIFont.systemFont(ofSize: 17)
         }
         nameTextField.placeholder = "Введите имя"
         ageTextField.placeholder = "Введите возраст"
