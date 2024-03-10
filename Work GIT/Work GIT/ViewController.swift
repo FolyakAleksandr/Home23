@@ -39,7 +39,7 @@ final class ViewController: UIViewController {
     // MARK: - helpers
 
     private func setupAppearanceView() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemGray4
     }
 
     private func layoutTextFields() {
@@ -86,7 +86,7 @@ final class ViewController: UIViewController {
         alertButton.layer.cornerRadius = 10
         alertButton.layer.shadowColor = UIColor.systemBlue.cgColor
         alertButton.layer.shadowOffset = .init(width: 0, height: 0)
-        alertButton.layer.shadowRadius = 8
+        alertButton.layer.shadowRadius = 10
         alertButton.layer.shadowOpacity = 0.5
     }
 
